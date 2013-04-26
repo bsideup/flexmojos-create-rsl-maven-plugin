@@ -3,12 +3,11 @@ package ru.trylogic.maven.plugin.rsl;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWC;
 import static net.flexmojos.oss.plugin.common.FlexExtension.SWF;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -67,7 +66,7 @@ public class RSLCreatorFromSWCMojo
      *
      * @parameter default-value="true" expression="${flex.optimizeRsl}"
      */
-    private boolean optimizeRsl;
+    protected boolean optimizeRsl;
 
     /**
      * When true it does update the swc digester information, doesn't make any sense not do it
@@ -77,19 +76,29 @@ public class RSLCreatorFromSWCMojo
      *
      * @parameter default-value="true" expression="${flex.updateSwcDigest}"
      */
-    private boolean updateSwcDigest;
+    protected boolean updateSwcDigest;
 
     /**
      * When true won't create a RSL (swf) for this project
      *
      * @parameter default-value="false" expression="${flex.skipRSLCreation}"
      */
-    private boolean skipRSLCreation;
+    protected boolean skipRSLCreation;
 
     /**
      * @component
      */
-    private ArtifactHandlerManager artifactHandlerManager;
+    protected ArtifactHandlerManager artifactHandlerManager;
+
+    /**
+     * The directory where the app is built.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    protected File buildDirectory;
+    
+    protected File outputSwcFile;
     
     public void execute()
             throws MojoExecutionException, MojoFailureException
@@ -100,17 +109,27 @@ public class RSLCreatorFromSWCMojo
             getLog().warn( "Skipping RSL creator, no SWC attached to this project." );
             return;
         }
-        
+
         getLog().info("Optimizing " + file.getAbsolutePath());
 
-        File input = optimize();
+        buildDirectory.mkdirs();
+
+        outputSwcFile = new File( build.getDirectory(), groupId + "/" + artifactId + "-" + version + ".swc" );
+        
+        try {
+            FileUtils.copyFile(file, outputSwcFile);
+        } catch (IOException e) {
+            throw new MavenRuntimeException( e.getMessage() + ": " + PathUtil.path( file ), e );
+        }
+
+        File optimizedSwfFile = optimize();
 
         if ( updateSwcDigest )
         {
             int result;
             try
             {
-                result = compiler.digest( getDigestConfiguration( input ), true ).getExitCode();
+                result = compiler.digest( getDigestConfiguration( optimizedSwfFile ), true ).getExitCode();
             }
             catch ( Exception e )
             {
@@ -123,22 +142,21 @@ public class RSLCreatorFromSWCMojo
             }
         }
 
-        Artifact sourceSwc = new DefaultArtifact(groupId, artifactId, version, null, SWC, null, artifactHandlerManager.getArtifactHandler(SWC));
-        sourceSwc.setFile(file);
-        sourceSwc.setResolved(true);
+        Artifact sourceSwcArtifact = new DefaultArtifact(groupId, artifactId, version, null, SWC, null, artifactHandlerManager.getArtifactHandler(SWC));
+        sourceSwcArtifact.setFile(outputSwcFile);
+        sourceSwcArtifact.setResolved(true);
 
-        getLog().debug("attaching original swc Artifact" + sourceSwc.getId());
+        getLog().debug("attaching original swc Artifact" + sourceSwcArtifact.getId());
 
-        project.addAttachedArtifact(sourceSwc);
+        project.addAttachedArtifact(sourceSwcArtifact);
 
-        Artifact generatedSwf = new DefaultArtifact(groupId, artifactId, version, null, SWF, null, artifactHandlerManager.getArtifactHandler(SWF));
-        generatedSwf.setFile(new File(getOutput()));
-        generatedSwf.setResolved(true);
+        Artifact generatedSwfArtifact = new DefaultArtifact(groupId, artifactId, version, null, SWF, null, artifactHandlerManager.getArtifactHandler(SWF));
+        generatedSwfArtifact.setFile(optimizedSwfFile);
+        generatedSwfArtifact.setResolved(true);
 
-        getLog().debug("attaching swf artifact " + generatedSwf.getId());
+        getLog().debug("attaching swf artifact " + generatedSwfArtifact.getId());
 
-        project.addAttachedArtifact(generatedSwf);
-        
+        project.addAttachedArtifact(generatedSwfArtifact);
     }
 
     @Override
@@ -167,7 +185,7 @@ public class RSLCreatorFromSWCMojo
 
             public File getSwcPath()
             {
-                return file;
+                return outputSwcFile;
             }
 
             public Boolean getSigned()
@@ -185,23 +203,23 @@ public class RSLCreatorFromSWCMojo
     @Override
     public String getInput()
     {
-        getLog().debug( "attempting to optimize: " + file.getName() );
+        getLog().debug( "attempting to optimize: " + outputSwcFile.getName() );
 
-        File bkpOriginalFile = new File( build.getDirectory(), FilenameUtils.removeExtension(file.getName()) + ".swf" );
+        File bkpOriginalFile = new File( build.getDirectory(), groupId + "/" + artifactId + "-" + version + ".library.swf" );
         try
         {
-            ZipFile zipFile = new ZipFile( file );
+            ZipFile zipFile = new ZipFile( outputSwcFile );
             ZipEntry entry = zipFile.getEntry( "library.swf" );
             if ( entry == null )
             {
-                throw new MavenRuntimeException( "Invalid SWC file. Library.swf not found. " + file );
+                throw new MavenRuntimeException( "Invalid SWC file. Library.swf not found. " + outputSwcFile );
             }
             InputStream inputSWF = zipFile.getInputStream( entry );
             IOUtil.copy( inputSWF, new FileOutputStream( bkpOriginalFile ) );
         }
         catch ( Exception e )
         {
-            throw new MavenRuntimeException( e.getMessage() + ": " + PathUtil.path( file ), e );
+            throw new MavenRuntimeException( e.getMessage() + ": " + PathUtil.path( outputSwcFile ), e );
         }
 
         return PathUtil.path( bkpOriginalFile );
