@@ -51,6 +51,30 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>trylogic-snapshot</id>
+            <url>http://repository-trylogic.forge.cloudbees.com/snapshot/</url>
+        </repository>
+
+        <repository>
+            <id>trylogic-releases</id>
+            <url>http://repository-trylogic.forge.cloudbees.com/release/</url>
+        </repository>
+
+        <repository>
+            <id>flex-mojos-repository</id>
+            <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>flex-mojos-repository</id>
+            <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <distributionManagement>
         <repository>
             <id>trylogic-releases</id>
