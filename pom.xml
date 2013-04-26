@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.flexmojos.oss</groupId>
+        <artifactId>flexmojos-parent</artifactId>
+        <version>5.0-beta</version>
+    </parent>
+
+    <groupId>ru.trylogic.maven</groupId>
+    <artifactId>flexmojos-create-rsl-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-metadata</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.flexmojos.oss</groupId>
+            <artifactId>flexmojos-maven-plugin</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.adobe.flex</groupId>
+                    <artifactId>compiler</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>trylogic-releases</id>
+            <url>http://nexus.trylogic.ru/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>trylogic-snapshots</id>
+            <url>http://nexus.trylogic.ru/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>
