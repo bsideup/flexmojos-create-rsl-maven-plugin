@@ -11,6 +11,7 @@
 
     <groupId>ru.trylogic.maven</groupId>
     <artifactId>flexmojos-create-rsl-plugin</artifactId>
+    <version>5.0-beta-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <build>
@@ -26,7 +27,7 @@
         <dependency>
             <groupId>net.flexmojos.oss</groupId>
             <artifactId>flexmojos-maven-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.adobe.flex</groupId>
