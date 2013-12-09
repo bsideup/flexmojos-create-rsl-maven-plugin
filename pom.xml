@@ -1,18 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>net.flexmojos.oss</groupId>
-        <artifactId>flexmojos-parent</artifactId>
-        <version>5.0-beta</version>
-    </parent>
-
     <groupId>ru.trylogic.maven</groupId>
     <artifactId>flexmojos-create-rsl-plugin</artifactId>
-    <version>5.0-beta-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <name>Adobe Flash RSL creator from file using Flexmojos code base.</name>
+
+    <url>https://github.com/bsideup/flexmojos-create-rsl-maven-plugin</url>
+
+    <description>Adobe Flash RSL creator from file using Flexmojos code base.</description>
+
+    <scm>
+        <url>https://github.com/bsideup/flexmojos-create-rsl-maven-plugin</url>
+        <connection>scm:git:https://github.com/bsideup/flexmojos-create-rsl-maven-plugin.git</connection>
+        <developerConnection>scm:git:https://github.com/bsideup/flexmojos-create-rsl-maven-plugin.git
+        </developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Sergei Egorov</name>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <build>
         <plugins>
@@ -23,11 +54,23 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven</artifactId>
+                <version>3.0.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>net.flexmojos.oss</groupId>
             <artifactId>flexmojos-maven-plugin</artifactId>
-            <version>${project.parent.version}</version>
+            <version>5.0-beta</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.adobe.flex</groupId>
@@ -44,11 +87,6 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <repositories>
@@ -64,15 +102,4 @@
             <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
         </pluginRepository>
     </pluginRepositories>
-
-    <distributionManagement>
-        <repository>
-            <id>trylogic-releases</id>
-            <url>http://nexus.trylogic.ru/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>trylogic-snapshots</id>
-            <url>http://nexus.trylogic.ru/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
